@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
-import classes from './App.module.css';
+import Layout from './Components/Layout/Layout'
+import BurgerBuilder from './Containers/BurgerBuilder/BurgerBuilder'
 
 class App extends Component {
   
   render(){
     return (
-      
-        <h1 className={classes.red}>Hello</h1>
-      
+        <div>
+          <Layout>
+            <BurgerBuilder />
+          </Layout>
+        </div>
     )
   }
 }
