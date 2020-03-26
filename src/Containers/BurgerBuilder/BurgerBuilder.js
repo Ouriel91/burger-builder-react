@@ -3,6 +3,13 @@ import Aux from '../../hoc/Auxilliary'
 import Burger from '../../Components/Burger/Burger'
 import BuildControls from '../../Components/Burger/BuildControls/BuildControls'
 
+const INGREDIENT_PRICES = {
+    salad: 0.5,
+    vegan_cheese: 0.4,
+    meat: 1.3,
+    lamb_bacon: 0.7
+}
+
 class BurgerBuilder extends Component{
 
     state = {
@@ -11,23 +18,69 @@ class BurgerBuilder extends Component{
             lamb_bacon: 0,
             vegan_cheese: 0,
             meat: 0
-        }
+        },
+        totalPrice: 4
     }
 
     addIngredientHandler = (type) => {
         
+        //update ingredients
+        const oldCount = this.state.ingerdients[type]
+        const updatedCount = oldCount + 1
+        const updatedIngredients = {
+            //state should be update immutable (something cannot change its value or state)
+            ...this.state.ingerdients
+        }
+        updatedIngredients[type] = updatedCount
+
+        //update price
+        const priceAddition = INGREDIENT_PRICES[type]
+        const oldPrice = this.state.totalPrice
+        const newPrice = oldPrice + priceAddition
+        this.setState({totalPrice: newPrice, ingerdients: updatedIngredients})
 
     }
 
     removeIngredientHandler = (type) => {
         
+        //update ingredients
+        const oldCount = this.state.ingerdients[type]
+        if(oldCount <= 0){
+            return
+        }
+        const updatedCount = oldCount - 1
+        const updatedIngredients = {
+            //state should be update immutable (something cannot change its value or state)
+            ...this.state.ingerdients
+        }
+        updatedIngredients[type] = updatedCount
+
+        //update price
+        const priceDeduction = INGREDIENT_PRICES[type]
+        const oldPrice = this.state.totalPrice
+        const newPrice = oldPrice - priceDeduction
+        this.setState({totalPrice: newPrice, ingerdients: updatedIngredients})
     }
 
     render(){
+
+        const disabledInfo ={
+            ...this.state.ingerdients
+        }
+
+        for(let key in disabledInfo){
+            //true or false by condition in each ingredient like {meat: true, salad: false...}
+            disabledInfo[key] = disabledInfo[key] <= 0  
+        }
+
         return(
             <Aux>
                 <Burger ingerdients={this.state.ingerdients} />
-                <BuildControls />
+                <BuildControls 
+                    ingerdientAdded={this.addIngredientHandler}
+                    ingerdientRemoved={this.removeIngredientHandler}
+                    disabled={disabledInfo}
+                    price={this.state.totalPrice}/>
             </Aux>
         )
     }
