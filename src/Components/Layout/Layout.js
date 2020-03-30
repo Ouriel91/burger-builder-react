@@ -2,6 +2,7 @@ import React from 'react'
 import Aux from '../../hoc/Auxilliary'
 import classes from './Layout.module.css'
 import Toolbar from '../Navigation/Toolbar/Toolbar'
+import SideDrawer from '../Navigation/SideDrawer/SideDrawer'
 
 //The content inside the <main> element should be unique to the document. 
 //It should not contain any content that is repeated across documents such as 
@@ -9,6 +10,7 @@ import Toolbar from '../Navigation/Toolbar/Toolbar'
 const layout = (props) => (
    <Aux>
         <Toolbar />
+        <SideDrawer />
         <main className={classes.Content}>
             {props.children}
         </main>
