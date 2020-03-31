@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import Aux from '../../hoc/Auxilliary'
+import Aux from '../Auxiliary/Auxiliary'
 import classes from './Layout.module.css'
-import Toolbar from '../Navigation/Toolbar/Toolbar'
-import SideDrawer from '../Navigation/SideDrawer/SideDrawer'
+import Toolbar from '../../Components/Navigation/Toolbar/Toolbar'
+import SideDrawer from '../../Components/Navigation/SideDrawer/SideDrawer'
 
 //The content inside the <main> element should be unique to the document. 
 //It should not contain any content that is repeated across documents such as 
