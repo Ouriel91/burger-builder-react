@@ -7,17 +7,28 @@ const withErrorHandler = (WrappedComponent, axios) => {
     return class extends Component {
 
         state = {
+            initialized: false,
             error: null
         }
 
-        componentDidMount() {
-            axios.interceptors.request.use(req => {
+        componentDidMount() { 
+            
+            this.requestInterceptor = axios.interceptors.request.use(req => {
                 this.setState({ error: null })
-                return req
+                return req;
             })
-            axios.interceptors.response.use(res => res, error => {
-                this.setState({ error }) //shorthand (error: error)
-            })
+            this.responseInterceptor = axios.interceptors.response.use(res => res, error => {
+                this.setState({ error: error })
+            });
+            this.setState({ initialized: true })
+        }
+
+        componentWillUnmount() {
+            //make sure that when we don't need this component anymore (that wrappers another component)
+            //to not create another interceptors when the others living, so when we re use this component it wiil
+            //not create another interceptors
+            axios.interceptors.request.eject(this.requestInterceptor)
+            axios.interceptors.response.eject(this.responseInterceptor)
         }
 
         errorConfirmedHandler = () => {
@@ -25,6 +36,10 @@ const withErrorHandler = (WrappedComponent, axios) => {
         }
 
         render() {
+
+            const { initialized } = this.state;
+            if (!initialized) return null;
+            
             return (
                 <Aux>
                     <Modal
