@@ -10,7 +10,9 @@ import Backdrop from '../Backdrop/Backdrop'
 class Modal extends Component {
 
     shouldComponentUpdate(nextProps, nextState){
-        return nextProps.show !== this.props.show
+        //when we clicked continue the modal children update (OrderSummary or Spinner)
+        //we add another check for children component so modal component update with spinner in it
+        return nextProps.show !== this.props.show || nextProps.children !== this.props.children
     }
 
     componentDidUpdate(){
