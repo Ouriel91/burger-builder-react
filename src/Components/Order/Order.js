@@ -16,7 +16,7 @@ const order = (props) => {
                 key={ingredient.name}
                 style={{
                     textTransform:'capitalize',
-                    display: 'inline',
+                    display: 'inline-block',
                     margin: '0 8px',
                     border: '1px solid #ccc',
                     padding: '5px'
