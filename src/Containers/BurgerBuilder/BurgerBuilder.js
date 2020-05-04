@@ -126,7 +126,15 @@ class BurgerBuilder extends Component {
             .catch(err => {
                 this.setState({ loading: false, purchasing: false }) //stop loading spinner and close modal
             }) */
-        this.props.history.push('/checkout')
+        const queryParams = []
+        for(let i in this.state.ingerdients){
+            queryParams.push(encodeURIComponent(i) + "=" + encodeURIComponent(this.state.ingerdients[i]))
+        }
+        const queryString = queryParams.join('&')
+        this.props.history.push({
+            pathname:'/checkout',
+            search: '?' + queryString,
+        })
     }
 
     render() {
