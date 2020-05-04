@@ -1,29 +1,33 @@
 import React, { Component } from 'react'
-import CheckoutSummary from '../../Components/Order/CheckoutSummary/CheckoutSummary'
 import { Route } from 'react-router-dom'
+import CheckoutSummary from '../../Components/Order/CheckoutSummary/CheckoutSummary'
+
 import ContactData from './ContactData/ContactData'
 
 class Checkout extends Component {
 
-    state = {
-        ingerdients: {
-            salad: 1,
-            meat: 1,
-            vegan_cheese: 1,
-            lamb_bacon: 1
-        }
-    }
-
-    componentDidMount() {
+    initState = () => {
         const query = new URLSearchParams(this.props.location.search)
         const ingerdients = {}
+        let price = 0
         for (let param of query.entries()) {
-            //key should be like this: ['salad', '1']
-            //each entry has key & value (0 & 1 places ), + make it number
-            ingerdients[param[0]] = +param[1]
+
+            if (param[0] === 'price') {
+                price = param[1]
+            } else {
+                //key should be like this: ['salad', '1']
+                //each entry has key & value (0 & 1 places ), + make it number
+                ingerdients[param[0]] = +param[1]
+            }
         }
-        this.setState({ ingerdients }) //shorthand
+        return {
+            ingerdients, //shorthand
+            totalPrice:price //create totalPrice when doesn't exists
+        }
+        
     }
+
+    state = this.initState()
 
     checkoutCanceledHandler = () => {
         //go to last page when cancel button clicked
@@ -42,7 +46,12 @@ class Checkout extends Component {
                     ingerdients={this.state.ingerdients}
                     checkoutCanceled={this.checkoutCanceledHandler}
                     checkoutContinued={this.checkoutContinuedHandler} />
-                <Route path={this.props.match.path + '/contact-data'} component={ContactData} />
+                <Route
+                    path={this.props.match.path + '/contact-data'}
+                    render={(props) => (<ContactData 
+                        ingerdients={this.state.ingerdients}
+                        price={this.state.totalPrice}
+                        {...props} />)} />
             </div>
         )
     }
