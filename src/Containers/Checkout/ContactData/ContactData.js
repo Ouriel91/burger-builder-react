@@ -8,11 +8,62 @@ import Input from '../../../Components/UI/Input/Input'
 class ConatactData extends Component {
 
     state = {
-        name: '',
-        email: '',
-        address: {
-            street: '',
-            postalCode: ''
+        orderForm: {
+            name: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Your Name'
+                },
+                value: '',
+                label:'Name:'
+            },
+            street: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Street'
+                },
+                value: '',
+                label:'Street:'
+            },
+            zipCode: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'ZIP Code'
+                },
+                value: '',
+                label:'ZIP Code:'
+            },
+            country: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Country'
+                },
+                value: '',
+                label:'Country:'
+            },
+            email: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'email',
+                    placeholder: 'Your E-Mail'
+                },
+                value: '',
+                label:'Email:'
+            },
+            deliveryMethod: {
+                elementType: 'select',
+                elementConfig: {
+                    options: [
+                        { value: 'fastest', displayValue: 'Fastest' },
+                        { value: 'cheapest', displayValue: 'Cheapest' }
+                    ]
+                },
+                value: ''
+            }
         },
         loading: false
     }
@@ -24,16 +75,7 @@ class ConatactData extends Component {
         const order = {
             ingerdients: this.props.ingerdients,
             price: this.props.price,
-            customer: {
-                name: 'Ouriel Ohayon',
-                address: {
-                    street: 'some street',
-                    zipCode: '12345',
-                    country: 'Israel',
-                },
-                email: 'something@gmail.com'
-            },
-            deliveryMethod: 'fatest'
+
         }
         axios.post('/orders.json', order)
             .then(res => {
@@ -47,12 +89,25 @@ class ConatactData extends Component {
 
     render() {
 
+        const formElementArray = []
+        for (let key in this.state.orderForm) {
+            formElementArray.push({
+                id: key,
+                config: this.state.orderForm[key]
+            })
+        }
+        
         let form = (
             <form>
-                <Input inputtype="input" type="text" name="name" placeholder="Your Name" label="Name:" />
-                <Input inputtype="input" type="text" name="email" placeholder="Your Mail" label="Email:" />
-                <Input inputtype="input" type="text" name="street" placeholder="Street" label="Street:" />
-                <Input inputtype="input" type="text" name="postal" placeholder="Postal Code" label="Postal Code:" />
+
+                {formElementArray.map(formElement => (
+                    <Input
+                        key={formElement.id}
+                        elementType={formElement.config.elementType}
+                        elementConfig={formElement.config.elementConfig}
+                        value={formElement.config.value}
+                        label={formElement.config.label} />
+                ))}
                 <Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
             </form>
         )
