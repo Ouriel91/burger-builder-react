@@ -16,7 +16,13 @@ class ConatactData extends Component {
                     placeholder: 'Your Name'
                 },
                 value: '',
-                label:'Name:'
+                label: 'Name:',
+                validation: {
+                    required: true
+                },
+                valid: false,
+                touched: false,
+                errorMessage: 'Name should not be empty'
             },
             street: {
                 elementType: 'input',
@@ -25,7 +31,13 @@ class ConatactData extends Component {
                     placeholder: 'Street'
                 },
                 value: '',
-                label:'Street:'
+                label: 'Street:',
+                validation: {
+                    required: true
+                },
+                valid: false,
+                touched: false,
+                errorMessage: 'Street should not be empty'
             },
             zipCode: {
                 elementType: 'input',
@@ -34,7 +46,15 @@ class ConatactData extends Component {
                     placeholder: 'ZIP Code'
                 },
                 value: '',
-                label:'ZIP Code:'
+                label: 'ZIP Code:',
+                validation: {
+                    required: true,
+                    minLength: 5,
+                    maxLength: 5
+                },
+                valid: false,
+                touched: false,
+                errorMessage: 'Only 5 characters for zip code'
             },
             country: {
                 elementType: 'input',
@@ -43,7 +63,13 @@ class ConatactData extends Component {
                     placeholder: 'Country'
                 },
                 value: '',
-                label:'Country:'
+                label: 'Country:',
+                validation: {
+                    required: true
+                },
+                valid: false,
+                touched: false,
+                errorMessage: 'Country should not be empty'
             },
             email: {
                 elementType: 'input',
@@ -52,7 +78,13 @@ class ConatactData extends Component {
                     placeholder: 'Your E-Mail'
                 },
                 value: '',
-                label:'Email:'
+                label: 'Email:',
+                validation: {
+                    required: true
+                },
+                valid: false,
+                touched: false,
+                errorMessage: 'Email should not be empty, and need to include @'
             },
             deliveryMethod: {
                 elementType: 'select',
@@ -62,20 +94,27 @@ class ConatactData extends Component {
                         { value: 'cheapest', displayValue: 'Cheapest' }
                     ]
                 },
-                value: ''
+                validation: {},
+                value: 'fastest',
+                label: 'Delivery options:',
+                valid:true
             }
         },
+        formIsValid:false,
         loading: false
     }
 
     orderHandler = (event) => {
         event.preventDefault()
         this.setState({ loading: true })
-
+        const formData = {}
+        for (let element in this.state.orderForm) {
+            formData[element] = this.state.orderForm[element].value
+        }
         const order = {
             ingerdients: this.props.ingerdients,
             price: this.props.price,
-
+            orderData: formData
         }
         axios.post('/orders.json', order)
             .then(res => {
@@ -87,6 +126,55 @@ class ConatactData extends Component {
             })
     }
 
+    inputChangedHandler = (event, inputId) => {
+        //not mutate state directly - make a copy 
+        //(in this case also to nested object - because orderForm is nested)
+        const updatedOrderForm = {
+            ...this.state.orderForm
+        }
+        const updadedFormElement = {
+            ...updatedOrderForm[inputId]
+        }
+        
+        updadedFormElement.value = event.target.value
+        updadedFormElement.valid = this.checkValidity(updadedFormElement.value, updadedFormElement.validation,
+            updadedFormElement.elementConfig.type,updadedFormElement.value)
+        updadedFormElement.touched = true
+        updatedOrderForm[inputId] = updadedFormElement
+
+        let formIsValid = true
+        for(let element in updatedOrderForm){
+            formIsValid = updatedOrderForm[element].valid && formIsValid
+        }
+
+        this.setState({ orderForm: updatedOrderForm ,formIsValid}) //shorthand
+    }
+
+    checkValidity(value, rules,type,contentValue) {
+        let isValid = true
+        
+        if (rules.required) {
+            //if rule should be required (not be empty) - cut the spaces in value beginning 
+            isValid = value.trim() !== '' && isValid //True gate 
+            //isValid assign to true only when isValid and this condition will be true
+        }
+
+        if(type === 'email'){
+            //special check for email that includes @
+            isValid = contentValue.includes('@') && isValid
+        }
+
+        if (rules.minLength) {
+            isValid = value.length >= rules.minLength && isValid
+        }
+
+        if (rules.maxLength) {
+            isValid = value.length <= rules.maxLength && isValid
+        }
+
+        return isValid
+    }
+
     render() {
 
         const formElementArray = []
@@ -96,9 +184,9 @@ class ConatactData extends Component {
                 config: this.state.orderForm[key]
             })
         }
-        
+
         let form = (
-            <form>
+            <form onSubmit={this.orderHandler}>
 
                 {formElementArray.map(formElement => (
                     <Input
@@ -106,9 +194,14 @@ class ConatactData extends Component {
                         elementType={formElement.config.elementType}
                         elementConfig={formElement.config.elementConfig}
                         value={formElement.config.value}
-                        label={formElement.config.label} />
+                        label={formElement.config.label}
+                        invalid={!formElement.config.valid}
+                        shouldValidate={formElement.config.validation}
+                        touched={formElement.config.touched}
+                        error={formElement.config.errorMessage}
+                        changed={(event) => this.inputChangedHandler(event, formElement.id)} />
                 ))}
-                <Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
+                <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
             </form>
         )
         if (this.state.loading) {
